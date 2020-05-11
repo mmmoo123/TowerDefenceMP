@@ -1,4 +1,4 @@
-package przeciwnicy;
+package model;
 
 import javax.swing.*;
 import java.applet.Applet;

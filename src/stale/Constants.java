@@ -15,4 +15,5 @@ public class Constants {
     // images
     public static final String MAPA_IMAGE_URL = "images/MapaTowerDefensa.png";
     public static final String IKONA_IMAGE_URL = "images/balon.png";
+    public static final String PRZECIWNIK_IMAGE_URL = "images/b1.png";
 }

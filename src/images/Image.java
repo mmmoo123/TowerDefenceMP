@@ -1,5 +1,5 @@
 package images;
 
 public enum Image {
-	MAPA,IKONA;
+	MAPA,IKONA,B1;
 }

@@ -15,6 +15,10 @@ public class ImageFactory {
 		case IKONA:
 			imageIcon = new ImageIcon(Constants.IKONA_IMAGE_URL);
 			break;
+
+			case B1:
+				imageIcon = new ImageIcon(Constants.PRZECIWNIK_IMAGE_URL);
+				break;
 		default:
 			break;
 		}
