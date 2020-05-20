@@ -6,6 +6,7 @@ import javax.swing.*;
 
 import images.Image;
 import images.ImageFactory;
+import interFace.Controls;
 
 public class GameMainFrame extends JFrame {
     public GameMainFrame(){
@@ -13,9 +14,9 @@ public class GameMainFrame extends JFrame {
     }
 
     private void initializeLayout() {
-
+    	
         add(new GamePanel());
-
+        
         setTitle(Constants.TITLE);
         setIconImage(ImageFactory.createImage(Image.IKONA).getImage());
         

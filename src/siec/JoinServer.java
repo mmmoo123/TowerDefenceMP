@@ -8,11 +8,11 @@ public class JoinServer {
 
     JoinServer(int port){
         try {
-            s = new Socket("185.161.93.50", port);
+            s = new Socket("79.185.144.80", port);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        System.out.println("Udało się połączyć!");
+        System.out.println("Udalo, sie poloczyc!");
     }
 }

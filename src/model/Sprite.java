@@ -1,19 +1,66 @@
 package model;
 
-import java.awt.Image;
+import java.awt.*;
+import java.io.Serializable;
 
-public abstract class Sprite {
+import images.Image;
 
-    private Image image;
+public abstract class Sprite implements Serializable {
+
+	int line;
+    int dx;
+	
     private boolean dead;
     private boolean visible = true;
-
+    protected int gold;
     protected int x;
     protected int y;
-    protected int dx;
+   // protected int dx;
     protected int hp;
+    protected Image graphic;
+    
+    public int move() {
+    	 if (this.y <= 150 && line == 0) {
+             this.y=this.y+dx;
+         }
+         if (this.y == 150 && this.x <= 160) {
+             line = 1;
+             this.x=this.x+dx;
+         }
+         if (this.x == 150 && line == 1) {
+             this.y=this.y-dx;
+         }
+         if (this.y == 50 && this.x <= 400 && line == 1) {
+             this.x=this.x+dx;
+         }
+         if (this.y <= 300 && this.x == 400) {
+             this.y=this.y+dx;
+         }
+         if (this.y == 300 && this.x >= 250) {
+             this.x=this.x-dx;
+             line = 2;
+         }
+         if (this.x == 250 && this.y <= 450 && line == 2) {
+             this.y=this.y+dx;
+         }
+         if (this.y == 450 && this.x >= 50) {
+             this.x=this.x-dx;
+             line = 3;
+         }
+         if (this.x == 50 && this.y < 700 && line == 3)
+             this.y=this.y+dx;
+         if (this.y == 700 && this.x < 600) {
+             line = 0;
+         }
 
-    public abstract void move();
+         if(this.hp <= 0){
+             this.setVisible(false);   
+             return gold;
+         }
+         return 0;
+    }
+    
+    public abstract int movePlayer2();
 
     public Sprite(){
         this.dead = false;
@@ -21,14 +68,6 @@ public abstract class Sprite {
 
     public void die(){
         this.dead = true;
-    }
-
-    public void setImage(Image image){
-        this.image = image;
-    }
-
-    public Image getImage(){
-        return this.image;
     }
 
     public void setX(int x){
@@ -66,4 +105,9 @@ public abstract class Sprite {
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
+    
+    public Image getImage(){
+        return this.graphic;
+    }
+    
 }

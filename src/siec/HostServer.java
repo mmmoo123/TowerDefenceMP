@@ -15,6 +15,6 @@ public class HostServer {
             e.printStackTrace();
         }
 
-        System.out.println("Klient się połączył!");
+        System.out.println("Klient sie polaczyl!");
     }
 }

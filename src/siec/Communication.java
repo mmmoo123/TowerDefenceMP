@@ -1,5 +1,7 @@
 package siec;
 
+import com.dosse.upnp.UPnP;
+import gra.GameState;
 import model.Sprite;
 import model.Tower;
 
@@ -16,15 +18,23 @@ public class Communication {
     String ipAddres;
     DatagramSocket socket;
 
-    public Communication(int portNumber, String ipAddres) throws IOException {
+    public Communication(int portNumber, String ipAddres, boolean isHost) throws IOException {
 
-        this.portNumber = portNumber;
         this.ipAddres = ipAddres;
-        socket = new DatagramSocket(portNumber);
 
+        if(isHost) {
+            socket = new DatagramSocket(portNumber);
+            //this.portNumber = portNumber + 1;
+            this.portNumber = portNumber;
+        }
+        else {
+            //socket = new DatagramSocket(portNumber + 1);
+            socket = new DatagramSocket(portNumber);
+            this.portNumber = portNumber;
+        }
     }
 
-    public List<Tower> reciveTowers() throws IOException, ClassNotFoundException {
+    public GameState reciveGameState() throws IOException, ClassNotFoundException {
 
         byte[] buffer = new byte[65535];
 
@@ -32,21 +42,23 @@ public class Communication {
         socket.receive(datagramPacket);
 
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(buffer));
-        List<Tower> towerList = (List<Tower>) inputStream.readObject();
+        GameState gs = (GameState) inputStream.readObject();
 
-        return towerList;
+        return gs;
     }
 
-    public void sendTowers(List<Tower> towerList) throws IOException, ClassNotFoundException {
+
+    public void sendGameState(GameState gs) throws IOException{
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream outputStream = new ObjectOutputStream(out);
-        outputStream.writeObject(towerList);
+        outputStream.writeObject(gs);
         outputStream.close();
 
         byte[] buffer = out.toByteArray();
 
         DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length, InetAddress.getByName(ipAddres), portNumber);
+
         socket.send(datagramPacket);
     }
 }
