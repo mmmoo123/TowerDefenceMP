@@ -10,7 +10,7 @@ public class Constants {
     public static final int WINDNOW_WIDTH = 1200;
     public static final int WINDNOW_HEIGHT = 800;
 
-    public static final int GAME_SPEED = 32;
+    public static final int GAME_SPEED = 30;
     
     public static final int youLoseX = 200;
     public static final int youLoseY = 250;
