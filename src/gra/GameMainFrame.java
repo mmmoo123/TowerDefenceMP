@@ -9,11 +9,13 @@ import images.ImageFactory;
 import interFace.Controls;
 
 public class GameMainFrame extends JFrame {
-    public GameMainFrame(){
+	
+	public GameMainFrame(){
         initializeLayout();
     }
 
     private void initializeLayout() {
+    	
     	
         add(new GamePanel());
         

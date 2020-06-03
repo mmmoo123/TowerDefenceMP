@@ -10,6 +10,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.rmi.RemoteException;
 import java.util.List;
 
 public class Communication {
@@ -24,23 +26,31 @@ public class Communication {
 
         if(isHost) {
             socket = new DatagramSocket(portNumber);
-            //this.portNumber = portNumber + 1;
-            this.portNumber = portNumber;
+
+            if(ipAddres.equals("127.0.0.1") )
+                this.portNumber = portNumber + 1;
+            else
+                this.portNumber = portNumber;
         }
         else {
-            //socket = new DatagramSocket(portNumber + 1);
-            socket = new DatagramSocket(portNumber);
+
+            if(ipAddres.equals("127.0.0.1") )
+                socket = new DatagramSocket(portNumber + 1);
+            else
+                socket = new DatagramSocket(portNumber);
+
             this.portNumber = portNumber;
         }
+        
     }
 
     public GameState reciveGameState() throws IOException, ClassNotFoundException {
-
+    	
         byte[] buffer = new byte[65535];
 
         DatagramPacket datagramPacket = new DatagramPacket(buffer, buffer.length);
         socket.receive(datagramPacket);
-
+        socket.setSoTimeout(2000);
         ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(buffer));
         GameState gs = (GameState) inputStream.readObject();
 
@@ -61,4 +71,5 @@ public class Communication {
 
         socket.send(datagramPacket);
     }
+    
 }

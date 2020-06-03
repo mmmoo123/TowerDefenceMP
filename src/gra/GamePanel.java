@@ -14,7 +14,7 @@ import model.Sprite;
 import model.Tower;
 import siec.Communication;
 import stale.Constants;
-
+import gra.GameMainFrame;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -25,8 +25,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import math.Calculation;
@@ -38,6 +40,7 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 	private int yMouse;
     private ImageIcon mapaImage;
     private ImageIcon youLose;
+    private ImageIcon youWinIcon;
     private ImageIcon interFaceBackGround;
     private ImageIcon FastTowerIcon;
     private ImageIcon SlowTowerIcon;
@@ -57,9 +60,13 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 	private int wave = 1;
 	private int typeTower=1;
 	public int buyedBaloons=0;
+	public int youWin=0;
 	Communication connection;
 	GameState enemyGameState;
 	ImageIcon imageIcon;
+	public String ip;
+	public String czyHost;
+	GameState gameState;
 	
     public GamePanel(){
         initializeVariables();
@@ -68,39 +75,29 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
     }
 
     private void initializeGame() {
-    	
-//        for(int i=0; i<40;i++) {
-//            
-//        	if(i<=10) {
-//        		SlowBaloon slowbaloon = new SlowBaloon(50,-50-(50*i));
-//            	this.player1baloonList.add(slowbaloon);
-//        	}        	
-//        	else if(i>10 && i<=20) {
-//            	Baloon baloon = new Baloon(50,-50-(50*i));
-//            	this.player1baloonList.add(baloon);
-//            }            	
-//            else if(i>20){
-//            	FastBaloon fastBaloon = new FastBaloon(50,-50-(50*i));
-//            	this.player1baloonList.add(fastBaloon);
-//            }
-//            	
-//         //   Baloon baloonOpponent = new Baloon(700,-50-(50*i));
-//         //   this.player2baloonList.add(baloonOpponent);
-//        }
-//        
-        
+    	     
     }
 
     private void initializeVariables(){
     	isBuying = false;
 		isSelling = false;
+		
+		ip = (String)JOptionPane.showInputDialog(null,"Podaj IP serwera", "IP serwera", JOptionPane.INFORMATION_MESSAGE, null, null, "127.0.0.1");
+		if(ip==null)
+			System.exit(0);
+		czyHost = (String)JOptionPane.showInputDialog(null,"Czy jestes hostem. Jesli tak wpisz 'true', jeœli wpisz 'false'", "Host czy nie", JOptionPane.INFORMATION_MESSAGE, null, null, "true");
+		
+		
 		UPnP.openPortUDP(7777);
 		//Czy jestes hostem
 				Scanner scan = new Scanner(System.in);
-				isHost = scan.nextBoolean();
-
+				//isHost = scan.nextBoolean();
+				if(Objects.equals("true", czyHost))
+					isHost = true;
+				else if(Objects.equals("false", czyHost))
+					isHost = false;
 				try {
-					connection = new Communication(7777,"185.161.93.5", isHost);
+					connection = new Communication(7777,ip, isHost);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -111,13 +108,15 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
         this.player1towerList = new ArrayList<>();
         this.mapaImage = ImageFactory.createImage(Image.MAPA);
         this.youLose = ImageFactory.createImage(Image.YouLose);
+        this.youWinIcon = ImageFactory.createImage(Image.YouWin);
         this.interFaceBackGround = ImageFactory.createImage(Image.InterfaceBackground);
-        this.FastTowerIcon = ImageFactory.createImage(Image.T1);
-        this.SlowTowerIcon = ImageFactory.createImage(Image.T2);
-        this.ObszarTowerIcon = ImageFactory.createImage(Image.T3);
-        this.balonIcon = ImageFactory.createImage(Image.B1);
-        this.slowBalonIcon = ImageFactory.createImage(Image.B2);
-        this.fastBalonIcon = ImageFactory.createImage(Image.B3);
+        this.FastTowerIcon = ImageFactory.createImage(Image.T1icon);
+        this.SlowTowerIcon = ImageFactory.createImage(Image.T2icon);
+        this.ObszarTowerIcon = ImageFactory.createImage(Image.T3icon);
+        this.balonIcon = ImageFactory.createImage(Image.B1icon);
+        this.slowBalonIcon = ImageFactory.createImage(Image.B2icon);
+        this.fastBalonIcon = ImageFactory.createImage(Image.B3icon);
+        
         this.timer = new Timer(Constants.GAME_SPEED,new GameLoop(this));
         this.timer.start();
         
@@ -170,30 +169,45 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
         g.drawImage(balonIcon.getImage(), 300, 650, null);
         g.drawImage(slowBalonIcon.getImage(), 300, 725, null);
         g.drawImage(fastBalonIcon.getImage(), 375, 650, null);
+
         if(typeTower==1 && isBuying && isCursorON==false)
         	g.drawImage(FastTowerIcon.getImage(), xMouse-25, yMouse-25, null);
         if(typeTower==2 && isBuying && isCursorON==false)
         	g.drawImage(SlowTowerIcon.getImage(), xMouse-25, yMouse-25, null);
         if(typeTower==3 && isBuying && isCursorON==false)
         	g.drawImage(ObszarTowerIcon.getImage(), xMouse-25, yMouse-25, null);
-        Color myWhite = new Color(223, 92, 255);
+        Color myWhite = new Color(255, 0, 0);
         g.setColor(myWhite);
-        g.drawString("HP: "+player1Hp, 0, 610);
-        g.drawString("GOLD: "+player1Gold, 0, 620);
+        g.drawString("HP: "+ player1Hp, 0, 610);
+        g.drawString("GOLD: "+ player1Gold, 0, 620);
+        if(isBuying)
+        	g.drawString("Kupujesz", 0, 630);
+        if(isSelling)
+        	g.drawString("Sprzedajesz", 0, 630);
         
         if(showLose == 1)
         	g.drawImage(youLose.getImage(), Constants.youLoseX, Constants.youLoseY, null);
+        if(youWin == 1)
+        	g.drawImage(youWinIcon.getImage(), Constants.youLoseX, Constants.youLoseY, null);
+        	
         
     }
 
     public void doneLoop() {
-    	if(player1Hp > 0) {
+
+    	if(player1Hp > 0 && youWin==0) {
         update();
         repaint();
     	}
     	else {
-    		showLose = 1;
-    		repaint();
+    		if(youWin==0) {
+    			showLose = 1;
+        		repaint();
+    		}
+    		else {
+    			repaint();
+    		}
+    			
     	}
     		
     		
@@ -248,13 +262,14 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
     		}
     			
     	}
-        System.out.println(player1baloonList.size());
-        GameState gameState = new GameState(player1Hp, player1baloonList, player1towerList, buyedBaloons);
+
+       // Czêœæ sieciowa
+		gameState = new GameState(player1Hp, player1baloonList, player1towerList, buyedBaloons);
 		buyedBaloons = 0;
 
         if(isHost)
         {
-
+        	
 			try {
 				enemyGameState = connection.reciveGameState();
 				connection.sendGameState(gameState);
@@ -263,7 +278,7 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}
+			} 
 		}
         else
 		{
@@ -274,7 +289,7 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
-			}
+			}	
 		}
 
 		enemyGameState.addOfset();
@@ -301,6 +316,13 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 				break;
 			default:
 				break;
+		}
+
+		//System.out.println("You WIN = "+ youWin );
+		if(ticsToNewWave>1) {
+			if(enemyGameState.getPlayerHp()<=0)
+				youWin=1;
+			System.out.println("HP WROGA = " + enemyGameState.getPlayerHp() );
 		}
         
     }
@@ -342,18 +364,18 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 		}
 		if(e.getKeyCode() == KeyEvent.VK_S) {
 
-			if(player1Gold >= 100 && buyedBaloons == 0) {
-
-				buyedBaloons = 2;
-				player1Gold = player1Gold - 100;
-			}
-		}
-		if(e.getKeyCode() == KeyEvent.VK_D) {
-
 			if(player1Gold >= 200 && buyedBaloons == 0) {
 
 				buyedBaloons = 3;
 				player1Gold = player1Gold - 200;
+			}
+		}
+		if(e.getKeyCode() == KeyEvent.VK_D) {
+
+			if(player1Gold >= 100 && buyedBaloons == 0) {
+
+				buyedBaloons = 2;
+				player1Gold = player1Gold - 100;
 			}
 		}
 	}
@@ -374,10 +396,7 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 	public void mouseMoved(MouseEvent e) {
 		xMouse = e.getX();
 		yMouse = e.getY();
-		if(Calculation.collisionWithRoad(e.getX(), e.getY(), 50, 50, 0) && this.player1towerList.isEmpty())
-			isCursorON=true;
-		else
-			isCursorON=false;
+		isCursorON= Calculation.collisionWithRoad(e.getX(), e.getY(), 50, 50, 0) && this.player1towerList.isEmpty();
 		for(Tower tower : this.player1towerList) {
 			if(Calculation.collision(Calculation.distance(e.getX(), e.getY(), 0, 0, tower.getX(), tower.getY(), 50, 50)) || Calculation.collisionWithRoad(e.getX(), e.getY(), 50, 50, 0)) {
 				isCursorON=true;
@@ -434,7 +453,6 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
 				}
 			isCursorON=true;			
 		}
-		//System.out.println(player1towerList.size());
 	}
 
 	@Override
