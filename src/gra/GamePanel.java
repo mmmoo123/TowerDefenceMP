@@ -13,6 +13,7 @@ import model.SlowTower;
 import model.Sprite;
 import model.Tower;
 import siec.Communication;
+import sounds.PlayMusic;
 import stale.Constants;
 import gra.GameMainFrame;
 import javax.swing.*;
@@ -75,7 +76,7 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
     }
 
     private void initializeGame() {
-    	     
+		PlayMusic.playMusic();
     }
 
     private void initializeVariables(){
@@ -214,6 +215,9 @@ public class GamePanel extends JPanel implements KeyListener, MouseListener ,Act
     }
 
     private void update() {
+
+		if(PlayMusic.musicIsStopped())
+			PlayMusic.playMusic();
 
     	if(ticsToNewWave==1000) {
     		ticsToNewWave=0;
